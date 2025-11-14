@@ -1,106 +1,92 @@
 import React, { FC, useContext, useEffect, useRef, useState } from "react";
-import { Page } from "zmp-ui";
+import { Header, Page } from "zmp-ui";
+import { getAccessToken, getLocation } from "zmp-sdk/apis";
+
+const KEY = "4a9LVONYkAWHDPNLR7F1";
+const APP_ID = "178197451477352177";
 
 const HomePage: FC = () => {
-  const refreshCont = useRef<HTMLDivElement | null>(null);
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const [pullChange, setPullChange] = useState<number>();
-  const [startPoint, setStartPoint] = useState(0);
-  const [isPulling, setIsPulling] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [user, setUser] = useState<TUser>({ at: "", rt: "", location: "" });
 
-  useEffect(() => {
-    const isAtTop = () =>
-      scrollContainerRef.current !== null &&
-      scrollContainerRef.current.scrollTop !== undefined
-        ? scrollContainerRef.current.scrollTop <= 10
-        : false;
+  async function getToken() {
+    try {
+      const { accessToken, refreshToken } = await getAccessToken();
 
-    const pullStart = (e: TouchEvent) => {
-      const touch_cord = e.touches[0].screenY;
+      setUser((prev) => ({
+        ...prev,
+        at: accessToken,
+        rt: refreshToken,
+      }));
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
-      if (isAtTop()) {
-        setIsPulling(true);
-        setStartPoint(touch_cord);
+  async function refreshZaloToken() {
+    const url = "https://oauth.zaloapp.com/v4/access_token";
+
+    const formData = new URLSearchParams();
+    formData.append("refresh_token", user?.rt);
+    formData.append("app_id", APP_ID);
+    formData.append("grant_type", "refresh_token");
+
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          secret_key: KEY,
+        },
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
-    };
 
-    const pull = (e: TouchEvent) => {
-      const touch_cord = e.touches[0].screenY;
+      const data = await response.json();
+      setUser((prev) => ({
+        ...prev,
+        at: data.access_token,
+        rt: data.refresh_token,
+      }));
+    } catch (error) {
+      console.error("Error refreshing token:", error);
+      throw error;
+    }
+  }
 
-      if (
-        !isAtTop() ||
-        !isPulling ||
-        (!isPulling && touch_cord <= startPoint)
-      ) {
-        return;
-      }
+  async function geUsertLocation() {
+    const { token } = await getLocation();
 
-      const pullLength = Math.max(0, touch_cord - startPoint);
-      setPullChange(pullLength);
-    };
+    const location = await fetch(`https://graph.zalo.me/v2.0/me/info`, {
+      method: "GET",
+      headers: {
+        access_token: user?.at,
+        code: token ?? "",
+        secret_key: KEY,
+      },
+    }).then((res) => res.json());
 
-    const endPull = (e: TouchEvent) => {
-      if (!isPulling) return;
-
-      setIsPulling(false);
-      if (pullChange !== undefined && pullChange > 220) {
-        initLoading();
-      }
-      setStartPoint(0);
-      setPullChange(0);
-    };
-
-    window.addEventListener("touchstart", pullStart);
-    window.addEventListener("touchmove", pull);
-    window.addEventListener("touchend", endPull);
-
-    return () => {
-      window.removeEventListener("touchstart", pullStart);
-      window.removeEventListener("touchmove", pull);
-      window.removeEventListener("touchend", endPull);
-    };
-  }, [isPulling, startPoint, pullChange]);
-
-  const initLoading = () => {
-    refreshCont.current?.classList.add("loading");
-    setLoading(true);
-    setTimeout(() => {
-      refreshCont.current?.classList.remove("loading");
-      setLoading(false);
-      console.log("Reload");
-    }, 1000);
-  };
+    setUser((prev) => ({
+      ...prev,
+      location: location,
+    }));
+  }
 
   return (
-    <Page className="flex-1 bg-[#DDDDDD]">
-      {/* Refresh indicator */}
-      <div
-        ref={refreshCont}
-        className="flex justify-center -mt-[50px] items-center pb-[10px]"
-        style={{ marginTop: (pullChange ?? 0) / 3.11 || "" }}
-      >
-        <div className="text-[#A1A1A1] text-4xl whitespace-nowrap">
-          {loading
-            ? "Loading"
-            : pullChange !== undefined && pullChange >= 220
-            ? "Release to refresh"
-            : "Pull down to refresh"}
+    <Page className="flex-1  bg-white">
+      <Header title="a" className="!relative" />
+      <div className="flex-1 overflow-auto px-[16px] flex flex-col gap-4">
+        <div className="break-all">Access token: {user?.at}</div>
+        <div className="break-all">Refresh token: {user?.rt}</div>
+        <div className="break-all">
+          Location: {JSON.stringify(user?.location?.data)}
         </div>
-      </div>
-      {/* Main content */}
-      <div
-        ref={scrollContainerRef}
-        className="body flex bg-white w-full flex-col p-[16px] gap-[20px] overflow-auto h-full"
-      >
-        <header className="flex flex-col text-center">
-          <h1 className="text-4xl font-bold">Welcome to my app!</h1>
-          <p>Pull down to refresh</p>
-        </header>
-        <div className="flex flex-col gap-[10px] w-full">
-          {Array.from({ length: 50 }).map((_, i) => (
-            <div key={i} className="w-full h-[40px] bg-gray-300"></div>
-          ))}
+        <div className="flex gap-4">
+          <button onClick={() => getToken()}>Get Access Token</button>
+          <button onClick={() => refreshZaloToken()}>Refresh token</button>
+          <button onClick={() => geUsertLocation()}>Get location</button>
         </div>
       </div>
     </Page>
@@ -108,3 +94,9 @@ const HomePage: FC = () => {
 };
 
 export default HomePage;
+
+type TUser = {
+  at: string;
+  rt: string;
+  location?: any;
+};

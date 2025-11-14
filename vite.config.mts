@@ -1,6 +1,7 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import svgr from "vite-plugin-svgr";
+import zaloMiniApp from "zmp-vite-plugin";
 // Removed the import for react-refresh as it's no longer needed
 
 // https://vitejs.dev/config/
@@ -12,6 +13,7 @@ export default () => {
     plugins: [
       svgr(),
       reactRefresh(),
+      zaloMiniApp(),
       {
         name: "override-config",
         config: () => ({
