@@ -1,6 +1,27 @@
 import React, { FC } from "react";
+import {
+  ConfigProvider,
+  Progress as OriginalProgress,
+  ProgressProps,
+} from "antd";
 
-const Progress: TProgress = ({
+const Progress: TProgress = ({ circleTextColor, ...props }) => {
+  return (
+    <ConfigProvider
+      theme={{
+        components: {
+          Progress: {
+            circleTextColor: circleTextColor,
+          },
+        },
+      }}
+    >
+      <OriginalProgress {...props} />
+    </ConfigProvider>
+  );
+};
+
+const ProgressSegments: TProgressSegments = ({
   percent,
   railSize = 8,
   strokeColor = "#3b82f6",
@@ -101,7 +122,15 @@ const Progress: TProgress = ({
   );
 };
 
-type TProgress = FC<{
+Progress.Segments = ProgressSegments;
+
+export { Progress };
+
+type TProgress = FC<ProgressProps & { circleTextColor?: string }> & {
+  Segments: TProgressSegments;
+};
+
+type TProgressSegments = FC<{
   percent: number;
   railSize?: number;
   strokeColor?: string;
@@ -113,5 +142,3 @@ type TProgress = FC<{
   }[];
   width?: number;
 }>;
-
-export { Progress };

@@ -9,11 +9,15 @@ import { ToastContainer } from "react-toastify";
 import HomePage from "./presentation/pages/DuluxMiniDBSell";
 
 import { AppProvider } from "./presentation/context/AppContext";
+import OrderSupportPage from "./presentation/pages/OrderSupportPage";
+import OrderDetailsPage from "./presentation/pages/OrderDetailsPage";
 
 const AppRoutes = () => {
   return (
     <AnimationRoutes>
       <Route path="/" element={<HomePage />}></Route>
+      <Route path="/order-support" element={<OrderSupportPage />}></Route>
+      <Route path="/orders/:orderId" element={<OrderDetailsPage />}></Route>
     </AnimationRoutes>
   );
 };
