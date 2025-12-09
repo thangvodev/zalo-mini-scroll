@@ -9,6 +9,11 @@ import "zmp-ui/zaui.css";
 
 import "./presentation/styles/app.scss";
 
+// Custom antd css
+import "./presentation/styles/antd.scss";
+
+import "./presentation/styles/zaui.scss";
+
 // import "./";
 // import "./utils/rippleEffect.js";
 // Import App Component

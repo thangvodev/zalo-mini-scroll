@@ -1,0 +1,239 @@
+// Number Input
+.custom-input-number {
+  .ant-input-number-input {
+    padding-right: 0;
+    padding-left: 0;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    text-align: center;
+  }
+}
+.ant-input-number-input-wrap {
+  height: 100%;
+
+  input {
+    height: 100%;
+  }
+}
+
+// Upload
+.customSizedUpload {
+  min-height: 0;
+  .ant-upload-list {
+    height: 100%;
+    min-width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .ant-upload {
+    width: 100%;
+    height: 100%;
+    align-items: unset !important;
+    justify-content: unset !important;
+  }
+  .ant-upload.ant-upload-select {
+    display: flex !important;
+    width: fit-content !important;
+    height: fit-content !important;
+    background: transparent !important;
+    border: none !important;
+    order: 0 !important;
+  }
+
+  .ant-upload-hidden {
+    position: absolute;
+  }
+  .ant-upload-list-item-container {
+    order: 1 !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    height: unset !important;
+    width: unset !important;
+    .ant-upload-list-item {
+      padding: 0 !important;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+    }
+  }
+}
+
+// Upload.Drag
+.customSizedUploadDrag {
+  .ant-upload.ant-upload-drag {
+    background: transparent !important;
+  }
+  .ant-upload.ant-upload-btn {
+    padding: unset !important;
+  }
+}
+
+// Pagination
+.ant-pagination {
+  .ant-pagination-item-active {
+    border-color: transparent !important;
+    background-color: #ebf4ff;
+  }
+}
+
+// Select
+.customSelect.ant-select {
+  .ant-select-selector {
+    border: 1px solid #d6d9dc !important;
+    border-radius: 4px;
+    padding: 12px;
+    width: 100%;
+    .ant-select-selection-wrap {
+      align-self: unset;
+    }
+    .ant-select-selection-item,
+    .ant-select-selection-placeholder {
+      font-size: 14px;
+    }
+    .ant-select-selection-item {
+      font-weight: 500;
+    }
+  }
+  .ant-select-item-option:not(:last-child) {
+    border-bottom: 1px solid #f4f6f4;
+  }
+}
+
+// Notification
+.ant-notification-notice-wrapper {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+// Checkbox
+.custom-checkbox {
+  .ant-checkbox-label {
+    flex: 1 1 0%;
+  }
+}
+
+// Radio
+.custom-radio {
+  .ant-radio-wrapper {
+    width: 100%;
+    margin-inline-end: 0;
+  }
+  .ant-radio-label {
+    padding-right: 0 !important;
+    flex: 1 1 0%;
+  }
+
+  .ant-radio-checked {
+    .ant-radio-inner {
+      background-color: white;
+      border-color: #4cba81;
+    }
+    .ant-radio-inner:after {
+      background-color: #4cba81;
+      width: 10px;
+      height: 10px;
+      transform: translate(3px, 3px);
+    }
+  }
+}
+
+// Tab
+.custom-tabs.ant-tabs {
+  .ant-tabs-nav {
+    .ant-tabs-nav-list {
+      width: 100%;
+      justify-content: center;
+      .ant-tabs-tab {
+        color: #535353;
+        flex: 1 1 0%;
+        justify-content: center;
+        padding-bottom: 10px;
+        padding-top: 10px;
+        padding-left: 10px;
+        padding-right: 10px;
+      }
+    }
+  }
+}
+.ant-tabs-content-holder {
+  .ant-tabs-content {
+    height: 100%;
+    .ant-tabs-tabpane {
+      height: 100%;
+    }
+  }
+}
+
+// Range picker
+.ant-picker-range {
+  .ant-picker-range-separator {
+    padding: 0;
+  }
+  .ant-picker-input {
+    flex: 1 1 0;
+    input {
+      text-align: center;
+    }
+  }
+}
+
+// Calendar
+.ant-picker-calendar {
+  .ant-picker-panel {
+    border: 0;
+    padding: 0 16px;
+    .ant-picker-body {
+      .ant-picker-content {
+        thead {
+          tr {
+            th {
+              font-size: 16px;
+              height: 36px;
+              color: #737373;
+            }
+          }
+        }
+        .ant-picker-cell {
+          padding-top: 4px;
+          padding-bottom: 4px;
+        }
+      }
+    }
+  }
+}
+
+// Date picker
+@media (max-width: 648px) {
+  .ant-picker-panels {
+    position: relative;
+    > *:last-child {
+      .ant-picker-date-panel {
+        width: auto;
+      }
+      .ant-picker-week-panel {
+        width: auto;
+      }
+      .ant-picker-month-panel {
+        width: auto;
+      }
+      .ant-picker-quarter-panel {
+        width: auto;
+      }
+      .ant-picker-year-panel {
+        width: auto;
+      }
+      .ant-picker-header-view,
+      .ant-picker-body {
+        display: none;
+      }
+      .ant-picker-header {
+        border: none;
+        position: absolute;
+        right: 0;
+        height: 40px;
+      }
+    }
+  }
+}
