@@ -10,6 +10,9 @@ const Content = () => {
       <button onClick={() => navigate("/order-support")}>
         Hỗ trợ đặt hàng
       </button>
+      <button onClick={() => navigate("/point-history")}>
+        Lịch sử tích điểm
+      </button>
       <FloatButton />
     </div>
   );

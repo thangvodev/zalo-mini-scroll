@@ -11,6 +11,7 @@ import HomePage from "./presentation/pages/DuluxMiniDBSell";
 import { AppProvider } from "./presentation/context/AppContext";
 import OrderSupportPage from "./presentation/pages/OrderSupportPage";
 import OrderDetailsPage from "./presentation/pages/OrderDetailsPage";
+import PointHistoryPage from "./presentation/pages/PointHistoryPage";
 
 const AppRoutes = () => {
   return (
@@ -18,6 +19,7 @@ const AppRoutes = () => {
       <Route path="/" element={<HomePage />}></Route>
       <Route path="/order-support" element={<OrderSupportPage />}></Route>
       <Route path="/orders/:orderId" element={<OrderDetailsPage />}></Route>
+      <Route path="/point-history" element={<PointHistoryPage />}></Route>
     </AnimationRoutes>
   );
 };
