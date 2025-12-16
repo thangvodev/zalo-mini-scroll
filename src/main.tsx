@@ -12,6 +12,8 @@ import { AppProvider } from "./presentation/context/AppContext";
 import OrderSupportPage from "./presentation/pages/OrderSupportPage";
 import OrderDetailsPage from "./presentation/pages/OrderDetailsPage";
 import PointHistoryPage from "./presentation/pages/PointHistoryPage";
+import DashboardPageCustomer from "./presentation/pages/DashboardPageCustomer";
+import DashboardPageSalesman from "./presentation/pages/DashboardPageSalesman";
 
 const AppRoutes = () => {
   return (
@@ -20,6 +22,14 @@ const AppRoutes = () => {
       <Route path="/order-support" element={<OrderSupportPage />}></Route>
       <Route path="/orders/:orderId" element={<OrderDetailsPage />}></Route>
       <Route path="/point-history" element={<PointHistoryPage />}></Route>
+      <Route
+        path="/report-customer"
+        element={<DashboardPageCustomer />}
+      ></Route>
+      <Route
+        path="/report-salesman"
+        element={<DashboardPageSalesman />}
+      ></Route>
     </AnimationRoutes>
   );
 };

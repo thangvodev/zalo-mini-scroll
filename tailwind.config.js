@@ -44,7 +44,7 @@ module.exports = {
         surface: "#FAFBFC",
         surface1: "#FBFBFB",
         surface2: "#F5F9FB",
-        blue1: "#EFF4F9",
+        blue1: "#F5F9FF",
         blue2: "#EBF3FF",
         blue4: "#3385FF",
         blue5: "#005AE0",

@@ -13,6 +13,12 @@ const Content = () => {
       <button onClick={() => navigate("/point-history")}>
         Lịch sử tích điểm
       </button>
+      <button onClick={() => navigate("/report-customer")}>
+        Báo cáo kết quả (customer)
+      </button>
+      <button onClick={() => navigate("/report-salesman")}>
+        Báo cáo kết quả (salesman)
+      </button>
       <FloatButton />
     </div>
   );
