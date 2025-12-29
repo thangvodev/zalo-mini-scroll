@@ -114,7 +114,8 @@ type RadioGroupProps<RecordType> = {
   divider?: React.ReactNode;
   extraRender?: (item?: RecordType) => React.ReactNode;
   allowUncheck?: boolean;
-} & OriginRadioGroupProps;
+  onChange?: (value: any) => void;
+} & Omit<OriginRadioGroupProps, "onChange">;
 
 type RadioButtonGroupProps<RecordType> = {
   items: RecordType[]; //an array of object ([{name: "abc"}, {name: "abcd"}])
