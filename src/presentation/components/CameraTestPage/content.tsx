@@ -1,169 +1,102 @@
-import React, { useState, useEffect, useRef } from "react";
-import {
-  createCameraContext,
-  MediaDevice,
-  ZMACamera,
-  FacingMode,
-  PhotoFrame,
-  PhotoQuality,
-  PhotoFormat,
-} from "zmp-sdk/apis";
+import React, { useEffect, useRef, useState } from "react";
 import { Button } from "../common/button";
 import { Radio } from "../common/radio";
 import { CapturePreviewPopup } from "./capture-preview-popup";
+import { Camera, TCameraBoxConfigs, TCameraHandle } from "../common/camera";
+import { MediaDevice } from "zmp-sdk/apis";
+import { ScanOverlay } from "./scan-overlay";
+import { Checkbox } from "../common/checkbox";
 
 const Content = () => {
-  const cameraRef = useRef<ZMACamera | null>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [isCameraReady, setIsCameraReady] = useState(false);
+  const cameraRef = useRef<TCameraHandle>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const [cameraList, setCameraList] = useState<MediaDevice[]>([]);
   const [deviceId, setDeviceId] = useState<string>();
+  const [scanBoxConfig, setScanBoxConfig] =
+    useState<TCameraBoxConfigs["boxConfig"]>();
+  const [isScan, setIsScan] = useState<boolean>(true);
 
   useEffect(() => {
-    const videoElement = videoRef.current;
-    if (!videoElement) {
-      console.log("Media component not ready");
+    if (!isScan) {
+      setScanBoxConfig(undefined);
       return;
     }
-    if (!cameraRef.current) {
-      cameraRef.current = createCameraContext({
-        videoElement: videoElement,
-        mediaConstraints: {
-          height: 640,
-          width: 480,
-          facingMode: FacingMode.BACK,
-          audio: false,
-        },
-      });
-      setIsCameraReady(true);
-    }
-  }, []);
 
-  useEffect(() => {
-    const startCamera = async () => {
-      const camera = cameraRef.current;
-      if (camera && isCameraReady) {
-        await camera.start();
-        const list = camera.getCameraList();
-        if (list && list.length > 0) {
-          setCameraList(list);
-          setDeviceId(list[list.length - 1].deviceId);
-        }
+    const updateScanBox = () => {
+      if (containerRef.current) {
+        const containerWidth = containerRef.current.offsetWidth;
+        const containerHeight = containerRef.current.offsetHeight;
+
+        const boxWidth = containerWidth * 0.95;
+        const boxHeight = containerHeight * 0.85;
+
+        const left = (containerWidth - boxWidth) / 2;
+        const top = (containerHeight - boxHeight) / 2;
+
+        setScanBoxConfig({
+          width: boxWidth,
+          height: boxHeight,
+          top: top,
+          left: left,
+        });
       }
     };
 
-    startCamera();
-  }, [isCameraReady]);
+    updateScanBox();
+    window.addEventListener("resize", updateScanBox);
 
-  useEffect(() => {
-    if (deviceId) {
-      const changeCamera = async () => {
-        await cameraRef.current?.setDeviceId(deviceId);
-      };
-
-      changeCamera();
-    }
-  }, [deviceId]);
-
-  const cropImageToVideoDisplay = (
-    imageData: string,
-    videoElement: HTMLVideoElement
-  ): Promise<string> => {
-    return new Promise((resolve) => {
-      const img = new Image();
-      img.onload = () => {
-        const canvas = document.createElement("canvas");
-        const ctx = canvas.getContext("2d");
-
-        if (!ctx) {
-          resolve(imageData);
-          return;
-        }
-
-        const displayWidth = videoElement.offsetWidth;
-        const displayHeight = videoElement.offsetHeight;
-        const displayAspect = displayWidth / displayHeight;
-
-        const imageWidth = img.width;
-        const imageHeight = img.height;
-        const imageAspect = imageWidth / imageHeight;
-
-        let sourceX = 0;
-        let sourceY = 0;
-        let sourceWidth = imageWidth;
-        let sourceHeight = imageHeight;
-
-        if (imageAspect > displayAspect) {
-          sourceWidth = imageHeight * displayAspect;
-          sourceX = (imageWidth - sourceWidth) / 2;
-        } else {
-          sourceHeight = imageWidth / displayAspect;
-          sourceY = (imageHeight - sourceHeight) / 2;
-        }
-
-        canvas.width = displayWidth * 2;
-        canvas.height = displayHeight * 2;
-
-        ctx.drawImage(
-          img,
-          sourceX,
-          sourceY,
-          sourceWidth,
-          sourceHeight,
-          0,
-          0,
-          canvas.width,
-          canvas.height
-        );
-
-        resolve(canvas.toDataURL("image/jpeg", 0.9));
-      };
-
-      img.src = imageData;
-    });
-  };
-
-  const handleTakePhoto = async () => {
-    const result: PhotoFrame = cameraRef.current?.takePhoto({
-      quality: PhotoQuality.NORMAL,
-      format: PhotoFormat.JPEG,
-      minScreenshotHeight: 1000,
-    });
-
-    if (result && videoRef.current) {
-      const croppedImage = await cropImageToVideoDisplay(
-        result.data,
-        videoRef.current
-      );
-      return croppedImage;
-    } else {
-      console.log("No data");
-      return null;
-    }
-  };
+    return () => window.removeEventListener("resize", updateScanBox);
+  }, [isScan]);
 
   return (
-    <div className="size-full relative">
-      <video
-        style={{
-          width: "100%",
-          height: "100%",
-          objectFit: "cover",
-        }}
-        ref={videoRef}
-        muted
-        playsInline
-        webkit-playsinline
-      />
+    <div className="size-full flex flex-col">
+      <div ref={containerRef} className="relative flex-1">
+        <Camera
+          ref={cameraRef}
+          onCameraListChange={setCameraList}
+          onDeviceIdChange={setDeviceId}
+          deviceId={deviceId}
+        />
+        <ScanOverlay
+          boxConfig={scanBoxConfig}
+          helperArea={(configs) => {
+            const { top, left } = configs.boxConfig ?? {};
 
-      <div className="z-10 absolute bottom-0 inset-x-0 flex flex-col gap-[20px] p-[16px] bg-black/50 rounded">
+            return (
+              <div
+                style={{
+                  position: "absolute",
+                  top: top,
+                  bottom: top,
+                  left: left,
+                  right: left,
+                }}
+              >
+                <div className="pb-[20px] flex justify-center items-end size-full">
+                  <div className="text-red-500 px-[10px] py-[5px] bg-white rounded-[4px]">
+                    Chưa hợp lệ, vui lòng chụp lại
+                  </div>
+                </div>
+              </div>
+            );
+          }}
+        />
+      </div>
+
+      <div className="flex flex-col justify-between gap-[10px] h-[200px] p-[16px] bg-white">
+        <Checkbox
+          checked={isScan}
+          onChange={(e) => setIsScan(e.target.checked)}
+        >
+          Scan
+        </Checkbox>
         <Radio.Group
           value={deviceId}
           items={cameraList.map((item) => ({
             label: item.label,
             value: item.deviceId,
           }))}
-          render={(item) => <div className="text-white">{item?.label}</div>}
+          render={(item) => <div className="text-black">{item?.label}</div>}
           onChange={(value) => {
             setDeviceId(value);
           }}
@@ -173,10 +106,12 @@ const Content = () => {
         <CapturePreviewPopup>
           {({ open, setImage }) => (
             <Button
-              text={<div className="text-white">Chụp ảnh</div>}
-              className="w-full border border-white py-[5px]"
+              text={<div className="text-black">Chụp ảnh</div>}
+              className="w-full border border-black py-[5px] flex-none"
               onClick={async () => {
-                const croppedImage = await handleTakePhoto();
+                const croppedImage = await cameraRef.current?.takePhoto({
+                  boxConfig: scanBoxConfig,
+                });
                 if (croppedImage) {
                   setImage(croppedImage);
                   open();

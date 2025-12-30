@@ -35,17 +35,14 @@ const CapturePreviewPopup: FC<Props> = ({ children }) => {
             padding: 0,
           }}
         >
-          <div
-            className="relative flex items-end"
-            style={{ width: "100vw", height: "100vh" }}
-          >
+          <div className="flex flex-col justify-end h-screen w-screen">
             {/* Image */}
-            <img src={image} alt="" className="" />
+            <img src={image} alt="" className="object-contain" />
             {/* Float Buttons */}
-            <div className="z-10 absolute bottom-0 inset-x-0 flex flex-col gap-[20px] p-[16px] bg-black/50 rounded">
+            <div className="p-[16px] bg-white flex flex-col items-center justify-end h-[200px]">
               <Button
-                text={<div className="text-white">Chụp lại</div>}
-                className="w-full border border-white py-[5px]"
+                text={<div className="text-black">Chụp lại</div>}
+                className="w-full border border-black py-[5px] flex-none"
                 onClick={handleCancel}
               />
             </div>
