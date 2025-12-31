@@ -1,5 +1,11 @@
-import React from "react";
-import { FormInstance, FormProps, Form as OriginalForm } from "antd";
+import React, { FC } from "react";
+import {
+  ConfigProvider,
+  FormInstance,
+  FormItemProps,
+  FormProps,
+  Form as OriginalForm,
+} from "antd";
 
 export const Form: FormComponent = (props) => {
   const requiredMark =
@@ -17,15 +23,31 @@ export const Form: FormComponent = (props) => {
   return <OriginalForm requiredMark={requiredMark} {...props} />;
 };
 
+const FormItem: FormItem = ({ labelFontSize, ...props }) => {
+  return (
+    <ConfigProvider
+      theme={{
+        components: {
+          Form: {
+            labelFontSize: labelFontSize,
+          },
+        },
+      }}
+    >
+      <OriginalForm.Item {...props} />
+    </ConfigProvider>
+  );
+};
+
 Form.useForm = OriginalForm.useForm;
-Form.Item = OriginalForm.Item;
+Form.Item = FormItem;
 Form.List = OriginalForm.List;
 Form.Provider = OriginalForm.Provider;
 Form.ErrorList = OriginalForm.ErrorList;
 
 interface FormComponent extends React.FC<Props> {
   useForm: () => [FormInstance];
-  Item: typeof OriginalForm.Item;
+  Item: typeof FormItem;
   List: typeof OriginalForm.List;
   Provider: typeof OriginalForm.Provider;
   ErrorList: typeof OriginalForm.ErrorList;
@@ -35,3 +57,5 @@ type Props = FormProps & {
   requiredMarkPosition?: "left" | "right";
   children?: React.ReactNode;
 };
+
+type FormItem = FC<FormItemProps & { labelFontSize?: number }>;

@@ -6,7 +6,7 @@ import { Route } from "react-router-dom";
 import { RecoilRoot } from "recoil";
 import { AnimationRoutes, App, Box, SnackbarProvider, ZMPRouter } from "zmp-ui";
 import { ToastContainer } from "react-toastify";
-import HomePage from "./presentation/pages/CameraTestPage";
+import HomePage from "./presentation/pages/GiftZonePage";
 
 import { AppProvider } from "./presentation/context/AppContext";
 import OrderSupportPage from "./presentation/pages/OrderSupportPage";
