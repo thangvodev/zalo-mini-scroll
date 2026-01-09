@@ -1,5 +1,5 @@
-import React, { FC } from "react";
-import Picker, { PickerProps } from "zmp-ui/picker";
+import React, { FC, useEffect, useMemo } from "react";
+import Picker, { PickerDataType, PickerProps } from "zmp-ui/picker";
 import type { Dayjs } from "dayjs";
 import dayjs from "dayjs";
 import {
@@ -8,12 +8,17 @@ import {
   ConfigProvider,
 } from "antd";
 import { RangePickerProps } from "antd/es/date-picker";
+import { createRoot, Root } from "react-dom/client";
+import { Button } from "./button";
+import ChevronIcon from "../icons/ChevronIcon";
 
 const DatePickerZUI: FC<TDatePickerZUIProps> = ({
   value,
   onChange,
   formatPickedValueDisplay,
   suffix,
+  hourFormat = "24h",
+  pickDate = true,
   ...props
 }) => {
   const weekdays = ["CN", "Th2", "Th3", "Th4", "Th5", "Th6", "Th7"];
@@ -28,8 +33,9 @@ const DatePickerZUI: FC<TDatePickerZUIProps> = ({
     };
   });
 
-  const virtualHours = Array.from({ length: 25 }, (_, i) =>
-    i.toString().padStart(2, "0")
+  const virtualHours = Array.from(
+    { length: hourFormat == "24h" ? 25 : 13 },
+    (_, i) => i.toString().padStart(2, "0")
   ).map((hour, index) => ({
     displayName: hour,
     value: index,
@@ -42,9 +48,33 @@ const DatePickerZUI: FC<TDatePickerZUIProps> = ({
     value: index,
   }));
 
+  const virtualPeriods = [
+    { displayName: "AM", value: "AM" },
+    { displayName: "PM", value: "PM" },
+  ];
+
   const reformatDayjsToPickerInput = (time: Dayjs = dayjs()) => {
+    const base: any = {};
+
+    if (pickDate) {
+      base.date = time.format("DD/MM/YYYY");
+    }
+
+    if (hourFormat === "12h") {
+      const hour24 = time.get("hour");
+      const hour12 = hour24 % 12 || 12;
+      const period = hour24 >= 12 ? "PM" : "AM";
+
+      return {
+        ...base,
+        hour: hour12 === 12 ? 0 : hour12,
+        minute: time.get("minute"),
+        period: period,
+      };
+    }
+
     return {
-      date: time.format("DD/MM/YYYY"),
+      ...base,
       hour: time.get("hour"),
       minute: time.get("minute"),
     };
@@ -53,10 +83,156 @@ const DatePickerZUI: FC<TDatePickerZUIProps> = ({
   const reformatPickerOutputToDayjs = (formattedTime): Dayjs => {
     const getValue = (key: string) => formattedTime[key]?.value;
 
-    return dayjs(getValue("date"), "DD/MM/YYYY")
-      .hour(getValue("hour") || 0)
-      .minute(getValue("minute") || 0);
+    let hour = getValue("hour") || 0;
+    if (hour === undefined || hour === null) {
+      hour = 0;
+    }
+
+    if (hourFormat === "12h") {
+      const period = getValue("period");
+      if (hour === 0) {
+        hour = 12;
+      }
+      if (period === "PM" && hour !== 12) {
+        hour += 12;
+      } else if (period === "AM" && hour === 12) {
+        hour = 0;
+      }
+    }
+
+    let baseDate: Dayjs;
+    if (pickDate) {
+      baseDate = dayjs(getValue("date"), "DD/MM/YYYY");
+    } else {
+      baseDate = value ? value.startOf("day") : dayjs().startOf("day");
+    }
+
+    return baseDate
+      .hour(hour)
+      .minute(getValue("minute") || 0)
+      .second(0)
+      .millisecond(0);
   };
+
+  const pickerData = useMemo(() => {
+    let options: PickerDataType[] = [];
+
+    options.push(
+      {
+        name: "hour",
+        options: virtualHours,
+      },
+      {
+        name: "minute",
+        options: virtualMinutes,
+      }
+    );
+
+    if (pickDate) {
+      options.push({
+        name: "date",
+        options: virtualDays,
+      });
+    }
+
+    if (hourFormat === "12h") {
+      options.push({
+        name: "period",
+        options: virtualPeriods,
+      });
+    }
+
+    return options;
+  }, [hourFormat]);
+
+  useEffect(() => {
+    const roots: Root[] = [];
+
+    const ChevronControls: FC<{ onUp: () => void; onDown: () => void }> = ({
+      onUp,
+      onDown,
+    }) => {
+      return (
+        <div className="size-full flex flex-col items-center justify-between py-[70px]">
+          <Button.Icon
+            icon={<ChevronIcon className="-rotate-90" />}
+            onClick={onUp}
+          />
+          <Button.Icon
+            icon={<ChevronIcon className="rotate-90" />}
+            onClick={onDown}
+          />
+        </div>
+      );
+    };
+
+    const addChevronControls = () => {
+      const pickerInner = document.querySelector(".zaui-picker-inner");
+      const pickerColumns = document.querySelectorAll(".zaui-picker-column");
+
+      if (pickerColumns.length === 0) {
+        setTimeout(addChevronControls, 100);
+        return;
+      }
+
+      if (pickerInner && !pickerInner.querySelector(".time-divider")) {
+        const hourColumn = pickerColumns[0];
+        const divider = document.createElement("div");
+        divider.className =
+          "time-divider flex items-center justify-center px-[1px]";
+        divider.textContent = ":";
+        divider.style.fontSize = "24px";
+        divider.style.fontWeight = "bold";
+
+        if (hourColumn.nextSibling) {
+          pickerInner.insertBefore(divider, hourColumn.nextSibling);
+        } else {
+          pickerInner.appendChild(divider);
+        }
+      }
+
+      pickerColumns.forEach((column, index) => {
+        if (column.querySelector(".picker-chevron-controls")) {
+          return;
+        }
+
+        const controlsContainer = document.createElement("div");
+        controlsContainer.className =
+          "picker-chevron-controls absolute inset-0 flex items-center justify-center pointer-events-none";
+        column.appendChild(controlsContainer);
+
+        const root = createRoot(controlsContainer);
+        roots.push(root);
+
+        root.render(
+          <ChevronControls
+            onUp={() => {
+              console.log("Up clicked for", column);
+            }}
+            onDown={() => {
+              console.log("Down clicked for", column);
+            }}
+          />
+        );
+      });
+    };
+
+    const observer = new MutationObserver(() => {
+      if (document.querySelector(".zaui-picker-column")) {
+        addChevronControls();
+      }
+    });
+
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+    });
+
+    return () => {
+      observer.disconnect();
+      roots.forEach((root) => root.unmount());
+    };
+  }, []);
 
   return (
     <Picker
@@ -69,20 +245,7 @@ const DatePickerZUI: FC<TDatePickerZUIProps> = ({
         return formatPickedValueDisplay?.(parseDate) || parseDate.format();
       }}
       suffix={<div className="mr-[10px]">{suffix}</div>}
-      data={[
-        {
-          name: "date",
-          options: virtualDays,
-        },
-        {
-          name: "hour",
-          options: virtualHours,
-        },
-        {
-          name: "minute",
-          options: virtualMinutes,
-        },
-      ]}
+      data={pickerData}
       {...props}
     />
   );
@@ -131,6 +294,8 @@ type TDatePickerZUIProps = Omit<
   value?: Dayjs;
   onChange?: any;
   formatPickedValueDisplay?: (value: Dayjs) => string;
+  hourFormat?: "12h" | "24h";
+  pickDate?: boolean;
 };
 
 type DatePickerType = FC<DatePickerProps & { fontSize?: number }> & {

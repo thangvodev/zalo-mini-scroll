@@ -50,7 +50,7 @@
 .zaui-sheet-content {
   border-top-left-radius: 24px !important;
   border-top-right-radius: 24px !important;
-  .zaui-picker {
+  .zaui-picker-panel {
     padding: 0 !important;
     .zaui-picker-header {
       padding: 0 16px;
@@ -64,24 +64,29 @@
       }
     }
     .zaui-picker-inner {
-      padding: 0 16px;
+      padding: 0 80px;
       .zaui-picker-column {
+        position: relative;
         margin: 0;
-        height: 343px;
+        // height: 100px;
         .zaui-picker-scroller {
           .zaui-picker-item {
             border-radius: 0;
             transition: background-color 0.2s ease-out;
+            transition: color 0.1s ease-in-out;
+            font-size: 20px;
+            font-weight: 600;
+            color: transparent;
           }
           .zaui-picker-item-selected {
             color: #101010;
+            background-color: white;
           }
         }
       }
     }
     .zaui-picker-action {
       padding: 12px 16px 20px;
-      box-shadow: 0px -4px 24px 0px #00000014;
       button {
         box-shadow: 0px 4px 24px 0px #7d6a6a14;
         background: #4cba81;
