@@ -51,8 +51,14 @@
   border-top-left-radius: 24px !important;
   border-top-right-radius: 24px !important;
   .zaui-picker-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    position: relative;
     padding: 0 !important;
+    flex: 1 1 0%;
     .zaui-picker-header {
+      margin: 0;
       padding: 0 16px;
       .zaui-picker-title {
         font-size: 20px;
@@ -64,12 +70,16 @@
       }
     }
     .zaui-picker-inner {
-      padding: 0 80px;
+      flex: 1 1 0%;
+    }
+    .zaui-picker-inner.picker-type-time {
+      padding: 0 50px;
       .zaui-picker-column {
+        height: 156px;
         position: relative;
         margin: 0;
-        // height: 100px;
         .zaui-picker-scroller {
+          margin-top: -52px;
           .zaui-picker-item {
             border-radius: 0;
             transition: background-color 0.2s ease-out;
@@ -85,7 +95,30 @@
         }
       }
     }
+    .zaui-picker-inner.picker-type-date {
+      padding: 0 20px;
+      .zaui-picker-column {
+        height: 156px;
+        position: relative;
+        margin: 0;
+        .zaui-picker-scroller {
+          margin-top: -52px;
+          .zaui-picker-item {
+            border-radius: 0;
+            transition: background-color 0.2s ease-out;
+            transition: color 0.05s ease-in-out;
+            font-size: 20px;
+            font-weight: 600;
+          }
+          .zaui-picker-item-selected {
+            color: #101010;
+            background-color: #f5faf9;
+          }
+        }
+      }
+    }
     .zaui-picker-action {
+      margin: 0;
       padding: 12px 16px 20px;
       button {
         box-shadow: 0px 4px 24px 0px #7d6a6a14;

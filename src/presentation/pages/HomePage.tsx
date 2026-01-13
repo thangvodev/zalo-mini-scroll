@@ -16,7 +16,6 @@ const HomePage: FC = () => {
           <Form.Item name="dateTime">
             <DatePickerZUI
               hourFormat="12h"
-              title="Chọn giờ"
               action={{
                 close: true,
                 text: "Xác nhận",
@@ -25,12 +24,11 @@ const HomePage: FC = () => {
               suffix={<ChevronIcon className="size-[10px] rotate-90" />}
               placeholder="Chọn ngày giờ"
               formatPickedValueDisplay={(value) => {
-                console.log(value);
                 return value.isSame(dayjs(), "day")
-                  ? value.format("[Hôm nay, ]H:mm")
-                  : value.format("DD [th] M[, ]H:mm");
+                  ? value.format("[Hôm nay, ]H:mm:ss")
+                  : value.format("DD [th] M YYYY[, ]H:mm:ss");
               }}
-              pickDate={false}
+              pickType="both"
             />
           </Form.Item>
         </Form>
