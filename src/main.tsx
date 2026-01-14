@@ -6,7 +6,7 @@ import { Route } from "react-router-dom";
 import { RecoilRoot } from "recoil";
 import { AnimationRoutes, App, Box, SnackbarProvider, ZMPRouter } from "zmp-ui";
 import { ToastContainer } from "react-toastify";
-import HomePage from "./presentation/pages/HomePage";
+import HomePage from "./presentation/pages/PgScanQrPage";
 
 import { AppProvider } from "./presentation/context/AppContext";
 import OrderSupportPage from "./presentation/pages/OrderSupportPage";
@@ -14,6 +14,9 @@ import OrderDetailsPage from "./presentation/pages/OrderDetailsPage";
 import PointHistoryPage from "./presentation/pages/PointHistoryPage";
 import DashboardPageCustomer from "./presentation/pages/DashboardPageCustomer";
 import DashboardPageSalesman from "./presentation/pages/DashboardPageSalesman";
+import PgScanQrPage from "./presentation/pages/PgScanQrPage";
+import CheckInEventPage from "./presentation/pages/CheckInEventPage";
+import CheckInEventHistoryPage from "./presentation/pages/CheckInEventHistoryPage";
 
 const AppRoutes = () => {
   return (
@@ -29,6 +32,12 @@ const AppRoutes = () => {
       <Route
         path="/report-salesman"
         element={<DashboardPageSalesman />}
+      ></Route>
+      <Route path="/pg-scan" element={<PgScanQrPage />}></Route>
+      <Route path="/checkin" element={<CheckInEventPage />}></Route>
+      <Route
+        path="/checkin-history"
+        element={<CheckInEventHistoryPage />}
       ></Route>
     </AnimationRoutes>
   );
